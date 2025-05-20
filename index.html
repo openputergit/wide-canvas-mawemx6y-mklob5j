@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dhurin Visitor Management System</title>
+    <script src="https://unpkg.com/webcam-easy/dist/webcam-easy.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.5/dist/signature_pad.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen font-['Inter']">
+    <div id="loginContainer" class="container mx-auto px-4 py-16 max-w-md">
+        <div class="bg-white rounded-lg shadow-lg p-8">
+            <div class="text-center mb-6">
+                <h1 class="text-3xl font-semibold text-blue-600">Dhurin</h1>
+                <p class="text-gray-500">Visitor Management System</p>
+            </div>
+            
+            <form id="loginForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Username</label>
+                    <input type="text" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" id="username">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Password</label>
+                    <input type="password" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" id="password">
+                </div>
+                <div id="loginError" class="text-red-500 text-sm hidden">
+                    Invalid username or password
+                </div>
+                <div>
+                    <button type="submit" class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                        <i class="bi bi-box-arrow-in-right me-2"></i> Log In
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="appContainer" class="container mx-auto px-4 py-8 max-w-2xl hidden">
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-2xl font-semibold text-blue-600">Dhurin Visitor Management</h1>
+                <button id="logoutBtn" class="text-sm text-gray-500 hover:text-gray-700">
+                    <i class="bi bi-box-arrow-right mr-1"></i> Logout
+                </button>
+            </div>
+            
+            <form id="visitorForm" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Name</label>
+                        <input type="text" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" id="name">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Email</label>
+                        <input type="email" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" id="email">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Phone</label>
+                        <input type="tel" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" id="phone">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Address</label>
+                        <input type="text" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" id="address">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Meeting With</label>
+                        <input type="text" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" id="meetPerson">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Purpose</label>
+                        <input type="text" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" id="purpose">
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Live Photo</label>
+                        <div class="mt-1">
+                            <video id="webcam" autoplay playsinline width="320" height="240" class="rounded-lg border"></video>
+                            <canvas id="canvas" class="hidden"></canvas>
+                            <div class="flex items-center mt-2 space-x-2">
+                                <button type="button" id="captureBtn" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                                    <i class="bi bi-camera mr-2"></i> Capture Photo
+                                </button>
+                                <span id="photoStatus" class="text-gray-500 text-sm hidden">Photo captured</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Signature</label>
+                        <div class="border rounded-lg mt-1">
+                            <canvas id="signaturePad" class="w-full h-40 border rounded-lg"></canvas>
+                        </div>
+                        <button type="button" id="clearSign" class="mt-2 text-sm text-blue-600 hover:text-blue-800">Clear Signature</button>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">In Time</label>
+                            <input type="datetime-local" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" id="inTime">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Out Time</label>
+                            <input type="datetime-local" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" id="outTime">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end">
+                    <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                        <i class="bi bi-save mr-2"></i> Submit
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="mt-6 bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-xl font-semibold mb-4 text-blue-600">Recent Visitors</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Meeting With</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">In Time</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Out Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="visitorsList" class="bg-white divide-y divide-gray-200">
+                        <!-- Visitor records will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Login functionality
+            const loginForm = document.getElementById('loginForm');
+            const loginContainer = document.getElementById('loginContainer');
+            const appContainer = document.getElementById('appContainer');
+            const logoutBtn = document.getElementById('logoutBtn');
+            const loginError = document.getElementById('loginError');
+            
+            // Simple, hard-coded credentials for demo purposes
+            const validCredentials = {
+                username: 'admin',
+                password: 'password'
+            };
+
+            // Check if user is logged in
+            if (localStorage.getItem('isLoggedIn') === 'true') {
+                showApp();
+            }
+
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                
+                if (username === validCredentials.username && password === validCredentials.password) {
+                    localStorage.setItem('isLoggedIn', 'true');
+                    showApp();
+                } else {
+                    loginError.classList.remove('hidden');
+                }
+            });
+
+            logoutBtn.addEventListener('click', () => {
+                localStorage.removeItem('isLoggedIn');
+                showLogin();
+            });
+
+            function showLogin() {
+                loginContainer.classList.remove('hidden');
+                appContainer.classList.add('hidden');
+                loginForm.reset();
+                loginError.classList.add('hidden');
+            }
+
+            function showApp() {
+                loginContainer.classList.add('hidden');
+                appContainer.classList.remove('hidden');
+                initializeApp();
+            }
+
+            // Initialize the app components after login
+            function initializeApp() {
+                // Set default in time to current time
+                const now = new Date();
+                now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+                document.getElementById('inTime').value = now.toISOString().slice(0, 16);
+                
+                // Initialize webcam
+                const webcam = new Webcam(document.getElementById('webcam'), 'user', document.getElementById('canvas'));
+                webcam.start()
+                    .then(result => {
+                        console.log("webcam started");
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    });
+
+                // Initialize signature pad
+                const canvas = document.getElementById('signaturePad');
+                const signaturePad = new SignaturePad(canvas, {
+                    backgroundColor: 'rgb(255, 255, 255)'
+                });
+
+                // Adjust canvas size
+                function resizeCanvas() {
+                    const ratio = Math.max(window.devicePixelRatio || 1, 1);
+                    canvas.width = canvas.offsetWidth * ratio;
+                    canvas.height = canvas.offsetHeight * ratio;
+                    canvas.getContext("2d").scale(ratio, ratio);
+                    signaturePad.clear();
+                }
+
+                window.addEventListener("resize", resizeCanvas);
+                resizeCanvas();
+
+                // Clear signature
+                document.getElementById('clearSign').addEventListener('click', () => {
+                    signaturePad.clear();
+                });
+
+                // Photo capturing
+                let photoTaken = false;
+                document.getElementById('captureBtn').addEventListener('click', () => {
+                    webcam.snap();
+                    photoTaken = true;
+                    document.getElementById('photoStatus').classList.remove('hidden');
+                });
+
+                // Form submission
+                document.getElementById('visitorForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    
+                    // Validate signature
+                    if (signaturePad.isEmpty()) {
+                        alert('Please provide signature');
+                        return;
+                    }
+
+                    // Validate photo
+                    if (!photoTaken) {
+                        alert('Please capture a photo');
+                        return;
+                    }
+
+                    // Get form data
+                    const formData = {
+                        name: document.getElementById('name').value,
+                        email: document.getElementById('email').value,
+                        phone: document.getElementById('phone').value,
+                        address: document.getElementById('address').value,
+                        meetPerson: document.getElementById('meetPerson').value,
+                        purpose: document.getElementById('purpose').value,
+                        inTime: document.getElementById('inTime').value,
+                        outTime: document.getElementById('outTime').value,
+                        photo: document.getElementById('canvas').toDataURL('image/jpeg'),
+                        signature: signaturePad.toDataURL()
+                    };
+
+                    // Save to local storage (in a real app, this would go to a server)
+                    saveVisitor(formData);
+                    
+                    // Reset form
+                    e.target.reset();
+                    signaturePad.clear();
+                    photoTaken = false;
+                    document.getElementById('photoStatus').classList.add('hidden');
+                    
+                    // Set default in time again
+                    const now = new Date();
+                    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+                    document.getElementById('inTime').value = now.toISOString().slice(0, 16);
+                    
+                    // Show success message
+                    alert('Visitor check-in successful!');
+                });
+
+                // Load existing visitors
+                loadVisitors();
+            }
+
+            // Save visitor data
+            function saveVisitor(visitorData) {
+                // Get existing visitors from localStorage
+                let visitors = JSON.parse(localStorage.getItem('visitors')) || [];
+                
+                // Add new visitor
+                visitors.push(visitorData);
+                
+                // Save back to localStorage
+                localStorage.setItem('visitors', JSON.stringify(visitors));
+                
+                // Update the visitors list
+                loadVisitors();
+            }
+
+            // Load and display visitors
+            function loadVisitors() {
+                const visitorsList = document.getElementById('visitorsList');
+                const visitors = JSON.parse(localStorage.getItem('visitors')) || [];
+                
+                // Clear existing list
+                visitorsList.innerHTML = '';
+                
+                // Format date for display
+                function formatDate(dateString) {
+                    if (!dateString) return 'N/A';
+                    const date = new Date(dateString);
+                    return date.toLocaleString();
+                }
+                
+                // Add visitors to the table
+                visitors.forEach(visitor => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">${visitor.name}</div>
+                            <div class="text-xs text-gray-500">${visitor.email}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">${visitor.meetPerson}</div>
+                            <div class="text-xs text-gray-500">${visitor.purpose}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            ${formatDate(visitor.inTime)}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            ${formatDate(visitor.outTime)}
+                        </td>
+                    `;
+                    visitorsList.appendChild(row);
+                });
+            }
+        });
+    </script>
+<script>document.body.addEventListener('wheel', e => { if (!e.ctrlKey) return; e.preventDefault(); return }, { passive: false })</script>
+	</body>
+</html>
